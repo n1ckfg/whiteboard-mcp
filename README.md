@@ -29,9 +29,9 @@ In zed
       "enabled": true,
       "command": "uv",
       "args": [
-        "run",
         "--project",
         "/path/to/webcam-mcp",
+        "run",
         "/path/to/webcam-mcp/whiteboard_mcp.py",
       ],
       "env": {},
