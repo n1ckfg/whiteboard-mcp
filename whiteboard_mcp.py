@@ -100,12 +100,12 @@ def capture_webcam(device_index=6, output_file="emeet_capture.png"):
 
 @mcp.tool
 def capture_whiteboard(
-    prompt: str = "What is in this image? Please give detailed OCR of text and plausible mermaid diagram of any figures drawn please",
+    prompt: str = "What is in this image? Please give detailed OCR of text, mathematical expressions, and plausible mermaid diagram of any figures drawn please",
 ):
     """Capture a whiteboard image and analyze it with AI.
 
     Args:
-        prompt: The prompt to use for analyzing the captured image
+        prompt: Optional[str] - The prompt to use for analyzing the captured image. If default it will use a generic math enabled OCR + mermaid diagram extracting prompt.
     """
     capture_webcam()
     description = describe_image(prompt=prompt)
