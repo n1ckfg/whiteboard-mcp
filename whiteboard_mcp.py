@@ -107,8 +107,10 @@ def capture_whiteboard(
     Args:
         prompt: Optional[str] - The prompt to use for analyzing the captured image. If default it will use a generic math enabled OCR + mermaid diagram extracting prompt.
     """
-    capture_webcam()
-    description = describe_image(prompt=prompt)
+    output_file = "./emeet_capture.png"
+    capture_webcam(output_file=output_file)
+    description = describe_image(file_location=output_file, prompt=prompt)
+    os.remove(output_file)
     return description
 
 
