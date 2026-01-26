@@ -1,5 +1,6 @@
 import base64
 import os
+import sys
 from datetime import datetime
 
 import cv2
@@ -8,12 +9,11 @@ from fastmcp import FastMCP
 from openai import OpenAI
 
 load_dotenv()
-api_key = os.getenv("ZAI_API_KEY")
-base_url = os.getenv("ZAI_BASE_URL")
+# Point to the local Ollama instance
+base_url = "http://localhost:11434/v1"
+api_key = "ollama"  # required, but unused
 
 client = OpenAI(api_key=api_key, base_url=base_url)
-print([x.id for x in client.models.list()])
-
 
 mcp = FastMCP(name="WhiteBoardCapture")
 
@@ -25,37 +25,37 @@ def describe_image(
     with open(file_location, "rb") as image_file:
         b64_image = base64.b64encode(image_file.read()).decode("utf-8")
 
-    response = client.responses.create(
-        model="glm-4.6v",
-        input=[
+    response = client.chat.completions.create(
+        model="llava:34b",
+        messages=[
             {
                 "role": "user",
                 "content": [
-                    {"type": "input_text", "text": prompt},
+                    {"type": "text", "text": prompt},
                     {
-                        "type": "input_image",
-                        "image_url": f"data:image/png;base64,{b64_image}",
+                        "type": "image_url",
+                        "image_url": {"url": f"data:image/png;base64,{b64_image}"},
                     },
                 ],
             }
         ],
     )
-    return response.output[0].content[0].text
+    return response.choices[0].message.content
 
 
-def capture_webcam(device_index=6, output_file="emeet_capture.png"):
+def capture_webcam(device_index=0, output_file="emeet_capture.png"):
     """Capture a single frame from webcam.
 
     Args:
         device_index: Webcam device index (default: 0)
         output_file: Output filename (default: webcam_capture_TIMESTAMP.png)
     """
-    print(f"📷 Attempting to open webcam at index {device_index}...")
+    print(f"📷 Attempting to open webcam at index {device_index}...", file=sys.stderr)
 
     cap = cv2.VideoCapture(device_index)
 
     if not cap.isOpened():
-        print(f"❌ Failed to open webcam at index {device_index}")
+        print(f"❌ Failed to open webcam at index {device_index}", file=sys.stderr)
         return False
 
     # Get camera properties
@@ -64,17 +64,17 @@ def capture_webcam(device_index=6, output_file="emeet_capture.png"):
     fps = int(cap.get(cv2.CAP_PROP_FPS))
     backend = cap.getBackendName()
 
-    print(f"✅ Webcam opened successfully!")
-    print(f"   Resolution: {width}x{height}")
-    print(f"   FPS: {fps}")
-    print(f"   Backend: {backend}")
+    print(f"✅ Webcam opened successfully!", file=sys.stderr)
+    print(f"   Resolution: {width}x{height}", file=sys.stderr)
+    print(f"   FPS: {fps}", file=sys.stderr)
+    print(f"   Backend: {backend}", file=sys.stderr)
 
     # Read a frame
-    print("📸 Capturing frame...")
+    print("📸 Capturing frame...", file=sys.stderr)
     ret, frame = cap.read()
 
     if not ret:
-        print("❌ Failed to capture frame")
+        print("❌ Failed to capture frame", file=sys.stderr)
         cap.release()
         return False
 
@@ -84,15 +84,15 @@ def capture_webcam(device_index=6, output_file="emeet_capture.png"):
         output_file = f"webcam_capture_{timestamp}.png"
 
     # Save the frame
-    print(f"💾 Saving to {output_file}...")
+    print(f"💾 Saving to {output_file}...", file=sys.stderr)
     success = cv2.imwrite(output_file, frame)
 
     if success:
-        print(f"✅ Successfully saved capture to {output_file}")
-        print(f"   Image size: {frame.shape[1]}x{frame.shape[0]} pixels")
-        print(f"   File size: {len(frame)} bytes (raw)")
+        print(f"✅ Successfully saved capture to {output_file}", file=sys.stderr)
+        print(f"   Image size: {frame.shape[1]}x{frame.shape[0]} pixels", file=sys.stderr)
+        print(f"   File size: {len(frame)} bytes (raw)", file=sys.stderr)
     else:
-        print(f"❌ Failed to save image to {output_file}")
+        print(f"❌ Failed to save image to {output_file}", file=sys.stderr)
 
     cap.release()
     return success
