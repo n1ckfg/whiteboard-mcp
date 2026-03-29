@@ -1,7 +1,3 @@
-# CLAUDE.md
-
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
-
 ## Project Overview
 
 whiteboard-mcp is an MCP (Model Context Protocol) server that captures images from a webcam and analyzes them using a Vision Language Model (VLM). It's designed for capturing whiteboards and extracting text (OCR), mathematical expressions, and diagrams (as mermaid syntax).
